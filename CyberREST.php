@@ -169,7 +169,8 @@
 	}
 
 	public function getRequestPartsFrom($apiStart = 'API') {
-		$parts = explode('/', $_SERVER['REQUEST_URI']);	
+		$uri = substr($_SERVER['REQUEST_URI'], 0, strpos( $_SERVER['REQUEST_URI'], '?'));
+		$parts = explode('/', $uri);
 		$index = 0;
 		while($parts[$index]!=$apiStart) {
 			unset($parts[$index]);
