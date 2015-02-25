@@ -185,11 +185,14 @@
 
 	public function encodeJSONforHTML($array)
 	{
+		if(is_array($array))
 		array_walk_recursive($array, function(&$item, $key) {
 				if(is_string($item)) {
 					$item = htmlentities($item);
 				}
 			});
+		else
+			$array = array();
 		return json_encode($array);
 	}
 }
