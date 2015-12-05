@@ -1,8 +1,5 @@
 #CyberREST
-=========
-
 Helper Class to create a REST API simmilar to Silex
-
 ##Usage
 CALL: http://www.domain.com/services/API/hola/23/Miguel
 ```
