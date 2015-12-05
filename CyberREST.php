@@ -2,25 +2,106 @@
 /**
  * Name: CyberREST
  * Description: Helper Class to create a REST API
- * @copyright 2014 SMendoza.net
- * @license    http://www.gnu.org/licenses/gpl-2.0.html  GNU GPL v2
- * @link       https://github.com/MiguelSMendoza/CyberREST
- * @version 1.0
+ * @license
+ * @copyright 2015 NetRunners.es
+ * @version 2.0
  * @author Miguel S. Mendoza <miguel@smendoza.net>
  **/
- class CyberREST {
+class CyberREST {
 
 	public $_allow = array();
 	public $_content_type = "application/json";
 	public $_request = array();
 	public $_format = "json";
-	public $parameters= array();
+	
+	private $apiStart = "API";
+	private $requestParts = array();
+	private $parameters = array();
+	private $patternParts = array();
 
 	private $_method = "";
 	private $_code = 200;
 
-	public function __construct(){
+	public function __construct($apiStart= "API") {
 		$this->inputs();
+		$this->apiStart = $apiStart;
+		$this->requestParts = $this->getRequestPartsFrom($apiStart);
+		$this->parameters = $this->parseIncomingParams();
+	}
+	
+	public function get($pattern, $function) {
+		return $this->processRequest("GET", $pattern, $function);
+	}
+	
+	public function post($pattern, $function) {
+		return $this->processRequest("POST", $pattern, $function);
+	}
+	
+	public function put($pattern, $function) {
+		return $this->processRequest("PUT", $pattern, $function);
+	}
+	
+	private function processRequest($method, $pattern, $function) {
+		if($this->checkValidRequest($method, $pattern)) {
+			$params = $this->getURIParameters();
+			array_unshift($params, $this);
+			call_user_func_array($function, $params);
+			return true;
+		} 
+		return false;
+	}
+
+	private function checkValidRequest($method, $pattern) {
+		return $this->getRequestMethod()==$method && $this->checkPattern($pattern);
+	}
+	
+	private function isParameter($string) {
+		if(preg_match('/{\w+}/', $string)>0) 
+			return true;
+		return false;
+	}
+	
+	private function cleanParameter($param) {
+		return str_replace(['{','}'], '', $param);
+	}
+
+	private function storeParameterWithValue($param,$value) {
+		$key = $this->cleanParameter($param);
+		$this->parameters[$key] = $value;
+	}
+	
+	private function getURIParameters () {
+		$params = array();
+		$count = count($this->patternParts);
+		for($i=0;$i<$count;$i++) {
+			if($this->isParameter($this->patternParts[$i])) {
+				$key = $this->cleanParameter($this->patternParts[$i]);
+				$params[$key] = $this->requestParts[$i];
+				$this->storeParameterWithValue($this->patternParts[$i], $this->requestParts[$i]);
+			} 
+		}
+		return $params;
+	}
+	
+	private function checkPattern($pattern) {
+		$parts = explode('/', $pattern);
+		if($parts[0]==="") { 
+			unset($parts[0]);
+			$parts = array_values($parts);
+		}
+		if(count($parts)==count($this->requestParts)) {
+			$count = count($parts);
+			for($i=0;$i<$count;$i++) {
+				if(!$this->isParameter($parts[$i]) 
+					&& 
+				($parts[$i] !== $this->requestParts[$i])) {
+					return false;
+				}
+			}
+			$this->patternParts = $parts;
+			return true;
+		} 
+		return false;
 	}
 
 	public function getReferer(){
@@ -109,7 +190,7 @@
 			foreach($data as $k => $v){
 				$clean_input[$k] = $this->cleanInputs($v);
 			}
-		}else{
+		} else{
 			if(get_magic_quotes_gpc()){
 				$data = trim(stripslashes($data));
 			}
@@ -127,17 +208,27 @@
 
 	public function parseIncomingParams() {
 		$parameters = array();
-
+		if($this->getRequestMethod()=="GET") {
+				$parameters = $this->parseGETParams();
+		} else {
+				$parameters = $this->parseParams();
+			}
+		return $parameters;
+	}
+	
+	private function parseGETParams() {
+		$parameters = array();
 		if (isset($_SERVER['QUERY_STRING'])) {
 			parse_str($_SERVER['QUERY_STRING'], $parameters);
 		}
-
-		// now how about PUT/POST bodies? These override what we got from GET
-
+		return $parameters;
+	}
+	
+	private function parseParams() {
+		$parameters = array();
 		$body = file_get_contents("php://input");
 		$content_type = false;
 		if(isset($_SERVER['CONTENT_TYPE'])) {
-
 			$content_type = $_SERVER['CONTENT_TYPE'];
 		}
 		switch($content_type) {
@@ -152,20 +243,20 @@
 			break;
 		case "application/x-www-form-urlencoded":
 			parse_str($body, $postvars);
-			foreach($postvars as $field => $value) {
+			foreach($postvars as $field => $value) {			
 				$parameters[$field] = $value;
-
 			}
 			$this->format = "html";
 			break;
 		default:
-			foreach($_POST as $field => $value) {
+			parse_str($body, $postvars);
+			foreach($postvars as $field => $value) {			
 				$parameters[$field] = $value;
 			}
+			$this->format = "html";
 			break;
 		}
-		$this->parameters = $parameters;
-		return $this->parameters;
+		return $parameters;
 	}
 
 	public function getRequestPartsFrom($apiStart = 'API') {
@@ -180,11 +271,12 @@
 			unset($parts[$index]);
 			$index++;
 		}
+		unset($parts[$index]);
+		if(strpos($parts[$index+1],".php")!==false) unset($parts[$index+1]);
 		return array_values($parts);
 	}
 
-	public function encodeJSONforHTML($array)
-	{
+	public function encodeJSONforHTML($array) {
 		if(is_array($array))
 		array_walk_recursive($array, function(&$item, $key) {
 				if(is_string($item)) {
