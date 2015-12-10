@@ -12,6 +12,7 @@
 			"homepage":"http://smendoza.net"
         }
     ],
+    "version": "1.0.0",
     "homepage": "https://github.com/MiguelSMendoza/CyberREST",
     "minimum-stability": "stable"
 }
