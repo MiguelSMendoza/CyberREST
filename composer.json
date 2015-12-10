@@ -12,5 +12,8 @@
 			"homepage":"http://smendoza.net"
         }
     ],
+    "autoload": {
+        "files": ["src/CyberREST/CyberREST.php"]
+    }
     "homepage": "https://github.com/MiguelSMendoza/CyberREST"
 }
