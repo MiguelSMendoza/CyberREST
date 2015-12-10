@@ -4,7 +4,7 @@
  * Description: Helper Class to create a REST API
  * @license http://www.gnu.org/licenses/gpl-2.0.html  GNU GPL v2
  * @copyright 2015 NetRunners.es
- * @version 2.0
+ * @version 1.0
  * @author Miguel S. Mendoza <miguel@smendoza.net>
  **/
 class CyberREST {

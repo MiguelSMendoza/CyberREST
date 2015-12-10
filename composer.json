@@ -1,0 +1,17 @@
+{
+    "name": "miguelsmendoza/rest-oauth",
+    "description": "Helper Class to create a REST API with OAuth Authentication",
+    "require": {
+        "bshaffer/oauth2-server-php": "~1.8"
+    },
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Miguel S. Mendoza",
+            "email": "miguel@smendoza.net",
+			"homepage":"http://smendoza.net"
+        }
+    ],
+    "homepage": "https://github.com/MiguelSMendoza/CyberREST",
+    "minimum-stability": "stable"
+}
