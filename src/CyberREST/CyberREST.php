@@ -7,6 +7,10 @@
  * @version 1.0
  * @author Miguel S. Mendoza <miguel@smendoza.net>
  **/
+
+require __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__.'/oauth/OAuthServer.php';
+
 class CyberREST {
 
 	public $_allow = array();
@@ -21,12 +25,43 @@ class CyberREST {
 
 	private $_method = "";
 	private $_code = 200;
+	
+	private $server;
 
 	public function __construct($apiStart= "API") {
 		$this->inputs();
 		$this->apiStart = $apiStart;
 		$this->requestParts = $this->getRequestPartsFrom($apiStart);
 		$this->parameters = $this->parseIncomingParams();
+		$this->server = new OAuthServer();
+	}
+	
+	public function handleTokenRequest() {
+		$this->server->handleTokenRequest();
+	}
+	
+	public function verifyRequest() {
+		if (!$this->server->verifyResourceRequest(OAuth2\Request::createFromGlobals())) {
+		    $this->server->getResponse()->send();
+		    return false;
+		}
+		return true;
+	}
+	
+	public function getApiStart() {
+		return $this->apiStart;
+	}
+	
+	public function getRequestParts() {
+		return $this->requestParts;
+	}
+	
+	public function getParameters() {
+		return $this->parameters;
+	}
+	
+	public function getPatternParts() {
+		return $this->patternParts;
 	}
 	
 	public function get($pattern, $function) {
@@ -39,6 +74,10 @@ class CyberREST {
 	
 	public function put($pattern, $function) {
 		return $this->processRequest("PUT", $pattern, $function);
+	}
+	
+	public function delete($pattern, $function) {
+		return $this->processRequest("DELETE", $pattern, $function);
 	}
 	
 	private function processRequest($method, $pattern, $function) {
@@ -83,12 +122,18 @@ class CyberREST {
 		return $params;
 	}
 	
-	private function checkPattern($pattern) {
+	public function parsePattern($pattern) {
 		$parts = explode('/', $pattern);
+		if(!isset($parts[0])) return array();
 		if($parts[0]==="") { 
 			unset($parts[0]);
 			$parts = array_values($parts);
 		}
+		return $parts;
+	}
+	
+	private function checkPattern($pattern) {
+		$parts = $this->parsePattern($pattern);
 		if(count($parts)==count($this->requestParts)) {
 			$count = count($parts);
 			for($i=0;$i<$count;$i++) {
@@ -105,7 +150,10 @@ class CyberREST {
 	}
 
 	public function getReferer(){
-		return $_SERVER['HTTP_REFERER'];
+		if(isset($_SERVER['HTTP_REFERER']))
+			return $_SERVER['HTTP_REFERER'];
+		else 
+			return "";
 	}
 
 	public function response($data,$status){
@@ -162,7 +210,10 @@ class CyberREST {
 	}
 
 	public function getRequestMethod(){
-		return $_SERVER['REQUEST_METHOD'];
+		if(isset($_SERVER['REQUEST_METHOD']))
+			return $_SERVER['REQUEST_METHOD'];
+		else
+			return '';
 	}
 
 	private function inputs(){
@@ -179,7 +230,7 @@ class CyberREST {
 			$this->_request = $this->cleanInputs($this->_request);
 			break;
 		default:
-			$this->response('',406);
+			//$this->response('Bad Request',200);
 			break;
 		}
 	}
@@ -202,8 +253,10 @@ class CyberREST {
 
 
 	private function setHeaders(){
-		header("HTTP/1.1 ".$this->_code." ".$this->getStatusMessage());
-		header("Content-Type:".$this->_content_type);
+		if(!headers_sent()){
+			header("HTTP/1.1 ".$this->_code." ".$this->getStatusMessage());
+			header("Content-Type:".$this->_content_type);
+		}
 	}
 
 	public function parseIncomingParams() {
@@ -261,18 +314,20 @@ class CyberREST {
 
 	public function getRequestPartsFrom($apiStart = 'API') {
 		$uri = "";
-		if (strpos( $_SERVER['REQUEST_URI'], '?') !== false) 
+		if(!isset($_SERVER['REQUEST_URI']))
+			$uri ="/";
+		else if (strpos( $_SERVER['REQUEST_URI'], '?') !== false) 
 		    $uri = substr($_SERVER['REQUEST_URI'], 0, strpos( $_SERVER['REQUEST_URI'], '?'));
 		else 
 			$uri = $_SERVER['REQUEST_URI'];
 		$parts = explode('/', $uri);
 		$index = 0;
-		while($parts[$index]!=$apiStart) {
+		while(isset($parts[$index]) && $parts[$index]!=$apiStart) {
 			unset($parts[$index]);
 			$index++;
 		}
 		unset($parts[$index]);
-		if(strpos($parts[$index+1],".php")!==false) unset($parts[$index+1]);
+		if(isset($parts[$index+1]) && ((strpos($parts[$index+1],".php")!==false))) unset($parts[$index+1]);
 		return array_values($parts);
 	}
 
