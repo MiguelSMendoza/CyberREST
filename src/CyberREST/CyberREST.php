@@ -49,10 +49,7 @@ class CyberREST {
 	}
 	
 	public function checkReferer($referer) {
-		if($this->getReferer()!==$referer)
-			return false;
-		else
-			return true;
+		return ($this->getReferer()===$referer);
 	}
 	
 	public function getApiStart() {
