@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/../src/CyberREST/CyberREST.php');
+require_once(dirname(__FILE__).'/../src/CyberREST.php');
 
 // register vendors if possible
 if (file_exists(__DIR__.'/../vendor/autoload.php')) {
