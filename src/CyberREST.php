@@ -8,8 +8,6 @@
  * @author Miguel S. Mendoza <miguel@smendoza.net>
  **/
 
-require __DIR__ . '/../vendor/autoload.php';
-
 class CyberREST {
 
 	public $_allow = array();
