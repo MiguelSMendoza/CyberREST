@@ -11,6 +11,7 @@ class CyberRESTTest extends \PHPUnit_Framework_TestCase
 		$this->assertFalse($cyber->checkRefererWhiteList());
 		$this->assertNull($cyber->handleTokenRequest());
         $this->assertNotNUll($cyber->getReferer());
+        $this->assertNotNUll($cyber->getClientIP());
         $this->assertEquals("TEST", $cyber->getApiStart());
         $this->assertNotNUll($cyber->getRequestParts());
         $this->assertNotNUll($cyber->getParameters());
