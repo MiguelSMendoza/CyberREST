@@ -265,7 +265,7 @@ class CyberREST {
 	private function setHeaders(){
 		if(!headers_sent()){
 			header("HTTP/1.1 ".$this->_code." ".$this->getStatusMessage());
-			header("Content-Type:".$this->_content_type);
+			header("Content-Type:".$this->_content_type." charset=utf-8");
 		}
 	}
 
