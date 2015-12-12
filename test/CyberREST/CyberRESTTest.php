@@ -8,7 +8,7 @@ class CyberRESTTest extends \PHPUnit_Framework_TestCase
 			//NOTHING;
 		});
 		$this->assertFalse($cyber->verifyRequest());
-		$this->assertFalse($cyber->checkReferer("foo"));
+		$this->assertFalse($cyber->checkRefererWhiteList());
 		$this->assertNull($cyber->handleTokenRequest());
         $this->assertNotNUll($cyber->getReferer());
         $this->assertEquals("TEST", $cyber->getApiStart());

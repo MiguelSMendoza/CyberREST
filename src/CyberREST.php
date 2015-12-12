@@ -54,8 +54,12 @@ class CyberREST {
 		
 	}
 	
-	public function checkReferer($referer) {
-		return ($this->getReferer()===$referer);
+	public function checkRefererWhiteList($whitelist=array()) {
+		$refererHost = parse_url($this->getReferer(), PHP_URL_HOST);
+		$in = in_array($refererHost, $whitelist);
+		$wowww = str_replace("www.", "", $refererHost);
+		$inwowww = in_array($wowww, $whitelist);
+		return ($in || $inwowww);
 	}
 	
 	public function getApiStart() {
