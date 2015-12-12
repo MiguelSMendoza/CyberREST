@@ -8,8 +8,7 @@
  * @author Miguel S. Mendoza <miguel@smendoza.net>
  **/
 
-require __DIR__ . '/../../vendor/autoload.php';
-require_once __DIR__.'/oauth/OAuthServer.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 class CyberREST {
 
