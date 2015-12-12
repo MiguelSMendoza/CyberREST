@@ -1,10 +1,6 @@
 {
     "name": "miguelsmendoza/rest-oauth",
     "description": "Helper Class to create a REST API with OAuth Authentication",
-    "require": {
-        "bshaffer/oauth2-server-php": "~1.8",
-        "phpunit/phpunit": "4.8.*"
-    },
     "license": "GPL",
     "authors": [
         {
@@ -13,8 +9,11 @@
             "homepage":"http://smendoza.net"
         }
     ],
+    "require": {
+        "bshaffer/oauth2-server-php": "~1.8"
+    },
     "require-dev": {
-        "phpunit/phpunit": "~4.4"
+        "phpunit/phpunit": "~4.8"
     },
     "autoload": {
         "classmap": [
