@@ -25,24 +25,33 @@ class CyberREST {
 	
 	private $server;
 
-	public function __construct($apiStart= "API") {
+	public function __construct($apiStart= "API", $oauth=false) {
 		$this->inputs();
 		$this->apiStart = $apiStart;
 		$this->requestParts = $this->getRequestPartsFrom($apiStart);
 		$this->parameters = $this->parseIncomingParams();
-		$this->server = new OAuthServer();
+		if($oauth) {
+			$this->server = new OAuthServer();
+		}
 	}
 	
 	public function handleTokenRequest() {
-		$this->server->handleTokenRequest();
+		if(isset($this->server)) {
+			$this->server->handleTokenRequest();
+		}
 	}
 	
 	public function verifyRequest() {
-		if (!$this->server->verifyResourceRequest(OAuth2\Request::createFromGlobals())) {
-		    $this->server->getResponse()->send();
-		    return false;
+		if(isset($this->server)) {
+			if (!$this->server->verifyResourceRequest(OAuth2\Request::createFromGlobals())) {
+			    $this->server->getResponse()->send();
+			    return false;
+			}
+			return true;
+		} else {
+			return false;
 		}
-		return true;
+		
 	}
 	
 	public function checkReferer($referer) {
