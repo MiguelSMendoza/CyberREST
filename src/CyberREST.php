@@ -185,8 +185,16 @@ class CyberREST {
 	public function response($data,$status){
 		$this->_code = ($status)?$status:200;
 		$this->setHeaders();
-		echo $data;
-		exit;
+		echo $this->parseResponse($data);
+		die();
+	}
+	
+	private function parseResponse($data) {
+		if(!is_array($data) && !is_object($data)) {
+			$data = ["response"=>$data];
+		}
+		$response = json_encode($data);
+		return $response;
 	}
 
 	private function getStatusMessage(){
