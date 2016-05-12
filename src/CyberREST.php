@@ -318,8 +318,7 @@ class CyberREST {
 		if(isset($_SERVER['CONTENT_TYPE'])) {
 			$content_type = $_SERVER['CONTENT_TYPE'];
 		}
-		switch($content_type) {
-		case "application/json":
+		if(strpos($content_type, "application/json") !== false) {
 			$body_params = json_decode($body);
 			if($body_params) {
 				foreach($body_params as $param_name => $param_value) {
@@ -327,21 +326,18 @@ class CyberREST {
 				}
 			}
 			$this->format = "json";
-			break;
-		case "application/x-www-form-urlencoded":
+		} else if(strpos($content_type, "application/x-www-form-urlencoded") !== false) {
 			parse_str($body, $postvars);
 			foreach($postvars as $field => $value) {			
 				$parameters[$field] = $value;
 			}
 			$this->format = "html";
-			break;
-		default:
+		} else {
 			parse_str($body, $postvars);
 			foreach($postvars as $field => $value) {			
 				$parameters[$field] = $value;
 			}
 			$this->format = "html";
-			break;
 		}
 		return $parameters;
 	}
