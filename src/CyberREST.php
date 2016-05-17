@@ -52,28 +52,37 @@ class CyberREST {
 		$this->parameters = $this->parseIncomingParams();
 	}
 		
-	public function authorizeRequest() {
+	public function getAuthHeader() {
 		$headers = apache_request_headers();
-		if(!isset($headers['authorization'])) {
-			return NULL;
+		if(isset($headers['Authorization'])) {
+			$authHeader = $headers['Authorization'];
+		} else if (isset($headers['authorization'])) {
+			$authHeader = $headers['authorization'];
+		} else {
+			return false;
 		}
-		$authHeader = $headers['Authorization'];
-		try {
-			list($jwt) = sscanf($authHeader, 'Authorization: Bearer %s');
+		return $authHeader;
+	}
+	
+	/* throws ExpiredException */	
+	public function authorizeRequest() {
+		$authHeader=$this->getAuthHeader();
+		if($authHeader)	{	
+			list($jwt) = sscanf($authHeader, 'Bearer %s');
 			$secretKey = base64_decode($this->JWTKey);
 			$token = Firebase\JWT\JWT::decode($jwt, $secretKey, array('HS512'));
-			return $token;
-		} catch (Exception $e) {
-            return NULL;
-       }
-       return NULL;
+			$newToken = $this->createToken($token->data);
+			return ["token"=>$newToken, "data"=>$token->data];
+		} else {
+			throw new Exception('Not Authorized');
+		}
 	}
 	
 	function createToken($data) {
 		$tokenId    = base64_encode(mcrypt_create_iv(32, MCRYPT_RAND));
 		$issuedAt   = time();
 		$notBefore  = $issuedAt + 10;
-		$expire     = $notBefore + 60;
+		$expire     = $notBefore + 604800;
 		$serverName = $this->ServerName; 
 
 		$data = [
