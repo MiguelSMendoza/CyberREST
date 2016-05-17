@@ -53,11 +53,11 @@ class CyberREST {
 	}
 		
 	public function authorizeRequest() {
-		$headers = $this->getHeaders();
+		$headers = apache_request_headers();
 		if(!isset($headers['authorization'])) {
 			return NULL;
 		}
-		$authHeader = $headers['authorization'];
+		$authHeader = $headers['Authorization'];
 		try {
 			list($jwt) = sscanf($authHeader, 'Authorization: Bearer %s');
 			$secretKey = base64_decode($this->JWTKey);
