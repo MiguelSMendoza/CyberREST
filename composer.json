@@ -1,6 +1,6 @@
 {
     "name": "miguelsmendoza/rest-oauth",
-    "description": "Helper Class to create a REST API with OAuth Authentication",
+    "description": "Helper Class to create a REST API with JWT Authentication",
     "license": "GPL",
     "authors": [
         {
@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "bshaffer/oauth2-server-php": "~1.8"
+        "firebase/php-jwt":"dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.8"

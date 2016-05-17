@@ -3,13 +3,14 @@
 class CyberRESTTest extends \PHPUnit_Framework_TestCase
 {
 	public function testGetMapping() {
-		$cyber = new CyberREST("TEST");
+		$config = new CyberConfig("TEST", "blablabla", "CyberPruebas");
+		$cyber = new CyberREST($config);
 		$cyber->get("/test/{foo}/{bar}", function($app, $id, $nombre) {
 			//NOTHING;
 		});
-		$this->assertFalse($cyber->verifyRequest());
+		$this->assertNull($cyber->authorizeRequest());
 		$this->assertFalse($cyber->checkRefererWhiteList());
-		$this->assertNull($cyber->handleTokenRequest());
+		$this->assertNotNUll($cyber->createToken(["nombre"=>"Miguel"]));
         $this->assertNotNUll($cyber->getReferer());
         $this->assertNotNUll($cyber->getClientIP());
         $this->assertEquals("TEST", $cyber->getApiStart());

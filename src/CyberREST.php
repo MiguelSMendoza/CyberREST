@@ -7,7 +7,19 @@
  * @version 1.0
  * @author Miguel S. Mendoza <miguel@smendoza.net>
  **/
-
+ 
+class CyberConfig {
+	public $API;
+	public $Secret;
+	public $ServerName;
+	
+	public function __construct($apiStart= "API", $secretKey = "", $servername = "") {
+		$this->API = $apiStart;
+		$this->Secret = $secretKey;
+		$this->ServerName = $servername;
+	}
+ }
+ 
 class CyberREST {
 
 	public $_allow = array();
@@ -15,6 +27,8 @@ class CyberREST {
 	public $_request = array();
 	public $_format = "json";
 	
+	private $JWTKey = "";
+	private $ServerName = "";
 	private $apiStart = "API";
 	private $requestParts = array();
 	private $parameters = array();
@@ -25,33 +39,60 @@ class CyberREST {
 	
 	private $server;
 
-	public function __construct($apiStart= "API", $oauth=false) {
-		$this->inputs();
-		$this->apiStart = $apiStart;
-		$this->requestParts = $this->getRequestPartsFrom($apiStart);
-		$this->parameters = $this->parseIncomingParams();
-		if($oauth) {
-			$this->server = new OAuthServer();
-		}
-	}
-	
-	public function handleTokenRequest() {
-		if(isset($this->server)) {
-			$this->server->handleTokenRequest();
-		}
-	}
-	
-	public function verifyRequest() {
-		if(isset($this->server)) {
-			if (!$this->server->verifyResourceRequest(OAuth2\Request::createFromGlobals())) {
-			    $this->server->getResponse()->send();
-			    return false;
-			}
-			return true;
+	public function __construct($config= "API") {
+		if(is_a($config, 'CyberConfig')) {
+			$this->apiStart = $config->API;
+			$this->JWTKey = $config->Secret;
+			$this->ServerName = $config->ServerName;
 		} else {
-			return false;
+			$this->apiStart = $apiStart;
 		}
+		$this->inputs();
+		$this->requestParts = $this->getRequestPartsFrom($this->apiStart);
+		$this->parameters = $this->parseIncomingParams();
+	}
 		
+	public function authorizeRequest() {
+		$headers = $this->getHeaders();
+		if(!isset($headers['authorization'])) {
+			return NULL;
+		}
+		$authHeader = $headers['authorization'];
+		try {
+			list($jwt) = sscanf($authHeader, 'Authorization: Bearer %s');
+			$secretKey = base64_decode($this->JWTKey);
+			$token = Firebase\JWT\JWT::decode($jwt, $secretKey, array('HS512'));
+			return $token;
+		} catch (Exception $e) {
+            return NULL;
+       }
+       return NULL;
+	}
+	
+	function createToken($data) {
+		$tokenId    = base64_encode(mcrypt_create_iv(32, MCRYPT_RAND));
+		$issuedAt   = time();
+		$notBefore  = $issuedAt + 10;
+		$expire     = $notBefore + 60;
+		$serverName = $this->ServerName; 
+
+		$data = [
+			'iat'  => $issuedAt,
+			'jti'  => $tokenId,
+			'iss'  => $serverName,
+			'nbf'  => $notBefore,
+			'exp'  => $expire,
+			'data' => $data
+		];
+		$secretKey = base64_decode($this->JWTKey);
+		
+		$jwt = Firebase\JWT\JWT::encode(
+			$data,
+			$secretKey, 
+			'HS512' 
+		);
+		
+		return $jwt;
 	}
 	
 	public function checkRefererWhiteList($whitelist=array()) {
@@ -372,5 +413,18 @@ class CyberREST {
 			$array = array();
 		return json_encode($array);
 	}
+	
+	function getHeaders() 
+    { 
+           $headers = ''; 
+       foreach ($_SERVER as $name => $value) 
+       { 
+           if (substr($name, 0, 5) == 'HTTP_') 
+           { 
+               $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value; 
+           } 
+       } 
+       return $headers; 
+    } 
 }
 ?>
