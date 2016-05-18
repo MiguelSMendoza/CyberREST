@@ -81,7 +81,7 @@ class CyberREST {
 	function createToken($data) {
 		$tokenId    = base64_encode(mcrypt_create_iv(32, MCRYPT_RAND));
 		$issuedAt   = time();
-		$notBefore  = $issuedAt + 10;
+		$notBefore  = $issuedAt;
 		$expire     = $notBefore + 604800;
 		$serverName = $this->ServerName; 
 
