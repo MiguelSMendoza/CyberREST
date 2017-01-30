@@ -45,7 +45,7 @@ class CyberREST {
 			$this->JWTKey = $config->Secret;
 			$this->ServerName = $config->ServerName;
 		} else {
-			$this->apiStart = $apiStart;
+			$this->apiStart = $config;
 		}
 		$this->inputs();
 		$this->requestParts = $this->getRequestPartsFrom($this->apiStart);
