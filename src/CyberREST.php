@@ -345,11 +345,8 @@ class CyberREST {
 
 	public function parseIncomingParams() {
 		$parameters = array();
-		if($this->getRequestMethod()=="GET") {
-				$parameters = $this->parseGETParams();
-		} else {
-				$parameters = $this->parseParams();
-			}
+		$parameters = array_merge($parameters,$this->parseGETParams());
+		$parameters = array_merge($parameters,$this->parseParams());
 		return $parameters;
 	}
 	
