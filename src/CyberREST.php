@@ -361,6 +361,9 @@ class CyberREST {
 	private function parseParams() {
 		$parameters = array();
 		$body = file_get_contents("php://input");
+		if(!$body) {
+			return $parameters;
+		}
 		$content_type = false;
 		if(isset($_SERVER['CONTENT_TYPE'])) {
 			$content_type = $_SERVER['CONTENT_TYPE'];
