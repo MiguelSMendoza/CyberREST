@@ -1,5 +1,8 @@
 PHP: true
 
-exclude_paths:
-- test/**/*
-- "**/vendor/**/*"
+engines:
+  phpmd:
+    enabled: true
+    checks:
+      Controversial/Superglobals:
+        enabled: false
