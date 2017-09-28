@@ -22,18 +22,18 @@ class CyberConfig {
 
  class OAuth {
 	private $Firebase;
-	private $JWTKey = "";
+	private $JwtKey = "";
 	private $ServerName = "";
 
 	public function setServerData($name, $key) {
-		$this->JWTKey = $key;
+		$this->JwtKey = $key;
 		$this->ServerName = $name;
 	}
 
-	public function __construct($serverName="CyberREST", $JWTKey="") {
+	public function __construct($serverName="CyberREST", $JwtKey="") {
 		$this->Firebase = new Firebase\JWT\JWT();
 		$this->ServerName = $serverName;
-		$this->JWTKey = $JWTKey;
+		$this->JwtKey = $JwtKey;
 	}
 
 	public function getAuthHeader() {
@@ -55,7 +55,7 @@ class CyberConfig {
 			return false;
 		}
 		list($jwt) = sscanf($authHeader, 'Bearer %s');
-		$secretKey = base64_decode($this->JWTKey);
+		$secretKey = base64_decode($this->JwtKey);
 		$token = $this->Firebase->decode($jwt, $secretKey, array('HS512'));
 		$newToken = $this->createToken($token->data);
 		return ["token"=>$newToken, "data"=>$token->data];
@@ -76,7 +76,7 @@ class CyberConfig {
 			'exp'  => $expire,
 			'data' => $data
 		];
-		$secretKey = base64_decode($this->JWTKey);
+		$secretKey = base64_decode($this->JwtKey);
 		
 		$jwt = $this->Firebase->encode(
 			$data,
