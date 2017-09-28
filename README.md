@@ -1,6 +1,6 @@
-#CyberREST
+# CyberREST
 Helper Class to create a REST API simmilar to Silex
-##Usage
+## Usage
 ```
 http://www.domain.com/services/API/api.php/hola/23/Miguel
 ```
