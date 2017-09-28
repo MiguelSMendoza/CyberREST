@@ -9,7 +9,7 @@ class CyberRESTTest extends TestCase
 			//NOTHING;
 		});
 		$this->assertFalse($cyber->checkRefererWhiteList());
-		$this->assertNotNUll($cyber->createToken(["nombre"=>"Miguel"]));
+		$this->assertNotNUll($cyber->OAuth->createToken(["nombre"=>"Miguel"]));
         $this->assertNotNUll($cyber->getRequestMethod());
         $this->assertNotNUll($cyber->getClientIP());
         $this->assertEquals("TEST", $cyber->getApiStart());
@@ -25,6 +25,6 @@ class CyberRESTTest extends TestCase
 			//NOTHING;
 		});
 		$this->expectException(Exception::class);
-		$cyber->authorizeRequest();
+		$cyber->OAuth->authorizeRequest();
 	}
 }

@@ -25,6 +25,11 @@ class CyberConfig {
 	private $JWTKey = "";
 	private $ServerName = "";
 
+	public function setServerData($name, $key) {
+		$this->JWTKey = $key;
+		$this->ServerName = $name;
+	}
+
 	public function __construct($serverName="CyberREST", $JWTKey="") {
 		$this->Firebase = new Firebase\JWT\JWT();
 		$this->ServerName = $serverName;
@@ -92,20 +97,20 @@ class CyberREST {
 	private $requestParts = array();
 	private $parameters = array();
 	private $patternParts = array();
-	private $OAuth;
+	public $OAuth;
 
 	private $code = 200;
 
 	public function __construct($config= "API") {
 		$this->apiStart = $config;
+		$this->OAuth = new OAuth();
 		if(is_a($config, 'CyberConfig')) {
 			$this->apiStart = $config->API;
-			$this->OAuth = new OAuth($config->ServerName, $config->Secret);
-		} 
+			$this->OAuth->setServerData($config->ServerName, $config->Secret);
+		}
 		$this->inputs();
 		$this->requestParts = $this->getRequestPartsFrom($this->apiStart);
 		$this->parameters = $this->parseIncomingParams();
-		
 	}
 	
 	public function checkRefererWhiteList($whitelist=array()) {
