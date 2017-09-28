@@ -19,33 +19,18 @@ class CyberConfig {
 		$this->ServerName = $servername;
 	}
  }
- 
-class CyberREST {
 
-	public $ContentType = "application/json";
-	public $Request = array();
-	
+ class OAuth {
+	private $Firebase;
 	private $JWTKey = "";
 	private $ServerName = "";
-	private $apiStart = "API";
-	private $requestParts = array();
-	private $parameters = array();
-	private $patternParts = array();
 
-	private $code = 200;
-
-	public function __construct($config= "API") {
-		$this->apiStart = $config;
-		if(is_a($config, 'CyberConfig')) {
-			$this->apiStart = $config->API;
-			$this->JWTKey = $config->Secret;
-			$this->ServerName = $config->ServerName;
-		} 
-		$this->inputs();
-		$this->requestParts = $this->getRequestPartsFrom($this->apiStart);
-		$this->parameters = $this->parseIncomingParams();
+	public function __construct($serverName="CyberREST", $JWTKey="") {
+		$this->Firebase = new Firebase\JWT\JWT();
+		$this->ServerName = $serverName;
+		$this->JWTKey = $JWTKey;
 	}
-		
+
 	public function getAuthHeader() {
 		$headers = apache_request_headers();
 		$authHeader = false;
@@ -56,7 +41,7 @@ class CyberREST {
 		}
 		return $authHeader;
 	}
-	
+
 	/* throws ExpiredException */	
 	public function authorizeRequest() {
 		$authHeader=$this->getAuthHeader();
@@ -66,11 +51,11 @@ class CyberREST {
 		}
 		list($jwt) = sscanf($authHeader, 'Bearer %s');
 		$secretKey = base64_decode($this->JWTKey);
-		$token = Firebase\JWT\JWT::decode($jwt, $secretKey, array('HS512'));
+		$token = $this->Firebase->decode($jwt, $secretKey, array('HS512'));
 		$newToken = $this->createToken($token->data);
 		return ["token"=>$newToken, "data"=>$token->data];
 	}
-	
+
 	function createToken($data) {
 		$tokenId    = base64_encode(mcrypt_create_iv(32, MCRYPT_RAND));
 		$issuedAt   = time();
@@ -88,13 +73,39 @@ class CyberREST {
 		];
 		$secretKey = base64_decode($this->JWTKey);
 		
-		$jwt = Firebase\JWT\JWT::encode(
+		$jwt = $this->Firebase->encode(
 			$data,
 			$secretKey, 
 			'HS512' 
 		);
-		
 		return $jwt;
+	}
+
+ }
+ 
+class CyberREST {
+
+	public $ContentType = "application/json";
+	public $Request = array();
+	
+	private $apiStart = "API";
+	private $requestParts = array();
+	private $parameters = array();
+	private $patternParts = array();
+	private $OAuth;
+
+	private $code = 200;
+
+	public function __construct($config= "API") {
+		$this->apiStart = $config;
+		if(is_a($config, 'CyberConfig')) {
+			$this->apiStart = $config->API;
+			$this->OAuth = new OAuth($config->ServerName, $config->Secret);
+		} 
+		$this->inputs();
+		$this->requestParts = $this->getRequestPartsFrom($this->apiStart);
+		$this->parameters = $this->parseIncomingParams();
+		
 	}
 	
 	public function checkRefererWhiteList($whitelist=array()) {
