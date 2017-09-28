@@ -215,19 +215,23 @@ class CyberREST {
 	
 	public function getClientIP() {
 		$ip="";
-		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-		    $ip = $_SERVER['HTTP_CLIENT_IP'];
-		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-		    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} elseif (!empty($_SERVER['REMOTE_ADDR'])) {
-		    $ip = $_SERVER['REMOTE_ADDR'];
+		$clientIP = filter_input(INPUT_SERVER, 'HTTP_CLIENT_IP', FILTER_SANITIZE_STRING);
+		$forwardFor = filter_input(INPUT_SERVER, 'HTTP_X_FORWARDED_FOR', FILTER_SANITIZE_STRING);
+		$remote = filter_input(INPUT_SERVER, 'REMOTE_ADDR', FILTER_SANITIZE_STRING);
+		if (!empty($clientIP)) {
+		    $ip = $clientIP;
+		} elseif (!empty($forwardFor)) {
+		    $ip = $forwardFor;
+		} elseif (!empty($remote)) {
+		    $ip = $remote;
 		}
 		return $ip;
 	}
 
 	public function getReferer(){
-		if(isset($_SERVER['HTTP_REFERER']))
-			return $_SERVER['HTTP_REFERER'];
+		$referer = filter_input(INPUT_SERVER, 'HTTP_REFERER', FILTER_SANITIZE_STRING);
+		if(isset($referer))
+			return $referer;
 		else 
 			return "";
 	}
