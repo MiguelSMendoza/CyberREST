@@ -10,10 +10,10 @@
         }
     ],
     "require": {
-        "firebase/php-jwt":"dev-master"
+        "firebase/php-jwt": "^5.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5"
+        "phpunit/phpunit": "^5.7"
     },
     "autoload": {
         "classmap": [
