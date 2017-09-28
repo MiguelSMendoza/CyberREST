@@ -20,6 +20,18 @@ class CyberConfig {
 	}
  }
 
+ class Environment {
+	 public static function getServer() {
+		 return $_SERVER;
+	 }
+	 public function getServerVar($var='') {
+		 if (isset($_SERVER[$var])) {
+			 return $_SERVER[$var];
+		 }
+		 return '';
+	 }
+ }
+
  class OAuth {
 	private $Firebase;
 	private $jwtKey = "";
@@ -98,11 +110,13 @@ class CyberREST {
 	private $parameters = array();
 	private $patternParts = array();
 	public $OAuth;
+	public $Environment;
 
 	private $code = 200;
 
 	public function __construct($config= "API") {
 		$this->apiStart = $config;
+		$this->Environment = new Environment();
 		$this->OAuth = new OAuth();
 		if(is_a($config, 'CyberConfig')) {
 			$this->apiStart = $config->API;
@@ -224,33 +238,33 @@ class CyberREST {
 	
 	public function getClientIP() {
 		$clientIP="";
-		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-		    $clientIP = $_SERVER['HTTP_CLIENT_IP'];
-		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-		    $clientIP = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} elseif (!empty($_SERVER['REMOTE_ADDR'])) {
-		    $clientIP = $_SERVER['REMOTE_ADDR'];
+		$httpClientIp = $this->Environment->getServerVar('HTTP_CLIENT_IP');
+		$httpXForwardedFor = $this->Environment->getServerVar('HTTP_X_FORWARDED_FOR');
+		$remoteAddr = $this->Environment->getServerVar('REMOTE_ADDR');
+		if (!empty($httpClientIp)) {
+		    $clientIP = $httpClientIp;
+		} elseif (!empty($httpXForwardedFor)) {
+		    $clientIP = $httpXForwardedFor;
+		} elseif (!empty($remoteAddr)) {
+		    $clientIP = $remoteAddr;
 		}
 		return $clientIP;
 	}
 
 	public function getReferer(){
-		if(isset($_SERVER['HTTP_REFERER']))
-			return $_SERVER['HTTP_REFERER'];
-		else 
-			return "";
+		return $this->Environment->getServerVar('HTTP_REFERER');
 	}
 
 	public function response($data,$status){
 		$this->code = ($status)?$status:200;
 		$this->setHeaders();
 		echo $this->parseResponse($data);
-		die($this->code);
+		// die($this->code);
 	}
 	
 	private function parseResponse($data) {
 		if(!is_array($data) && !is_object($data)) {
-			$data = ["response"=>$data];
+			$data = ["response" => $data];
 		}
 		$response = json_encode($data);
 		return $response;
@@ -303,10 +317,7 @@ class CyberREST {
 	}
 
 	public function getRequestMethod(){
-		if(isset($_SERVER['REQUEST_METHOD']))
-			return $_SERVER['REQUEST_METHOD'];
-		else
-			return '';
+		return $this->Environment->getServerVar('REQUEST_METHOD');
 	}
 
 	private function inputs(){
@@ -361,9 +372,8 @@ class CyberREST {
 	
 	private function parseGETParams() {
 		$parameters = array();
-		if (isset($_SERVER['QUERY_STRING'])) {
-			parse_str($_SERVER['QUERY_STRING'], $parameters);
-		}
+		$queryString = $this->Environment->getServerVar('QUERY_STRING');
+		parse_str($queryString, $parameters);
 		return $parameters;
 	}
 	
@@ -373,10 +383,7 @@ class CyberREST {
 		if(!$body) {
 			return $parameters;
 		}
-		$contentType = false;
-		if(isset($_SERVER['CONTENT_TYPE'])) {
-			$contentType = $_SERVER['CONTENT_TYPE'];
-		}
+		$contentType = $this->Environment->getServerVar('CONTENT_TYPE');
 		if(strpos($contentType, "application/json") !== false) {
 			$bodyParams = json_decode($body);
 			foreach((array) $bodyParams as $paramName => $paramValue) {
@@ -402,12 +409,13 @@ class CyberREST {
 
 	public function getRequestPartsFrom($apiStart = 'API') {
 		$uri = "";
-		if(!isset($_SERVER['REQUEST_URI']))
+		$requestUri = $this->Environment->getServerVar('REQUEST_URI');
+		if(empty($requestUri))
 			$uri ="/";
-		else if (strpos( $_SERVER['REQUEST_URI'], '?') !== false) 
-		    $uri = substr($_SERVER['REQUEST_URI'], 0, strpos( $_SERVER['REQUEST_URI'], '?'));
+		else if (strpos($requestUri, '?') !== false) 
+		    $uri = substr($requestUri, 0, strpos($requestUri, '?'));
 		else 
-			$uri = $_SERVER['REQUEST_URI'];
+			$uri = $requestUri;
 		$parts = explode('/', $uri);
 		$index = 0;
 		while(isset($parts[$index]) && $parts[$index]!=$apiStart) {
@@ -433,7 +441,7 @@ class CyberREST {
 	
 	function getHeaders()  { 
 		$headers = ''; 
-		foreach ($_SERVER as $name => $value)  { 
+		foreach ($this->Environment->getServer() as $name => $value)  { 
 			if (substr($name, 0, 5) == 'HTTP_') { 
 				$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value; 
 			} 
@@ -444,7 +452,7 @@ class CyberREST {
 
 if (!function_exists('apache_request_headers')) { 
 	function apache_request_headers() { 
-		foreach($_SERVER as $key=>$value) { 
+		foreach(Environment::getServer() as $key=>$value) { 
 			$out[$key]=$value; 
 			if (substr($key,0,5)=="HTTP_") { 
 				$key=str_replace(" ","-",ucwords(strtolower(str_replace("_"," ",substr($key,5))))); 
