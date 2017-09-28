@@ -6,3 +6,9 @@ engines:
     checks:
       Controversial/Superglobals:
         enabled: false
+ratings:
+  paths:
+  - src/**
+exclude_paths:
+- test/**/*
+- "**/vendor/**/*"
