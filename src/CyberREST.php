@@ -379,10 +379,8 @@ class CyberREST {
 		}
 		if(strpos($contentType, "application/json") !== false) {
 			$bodyParams = json_decode($body);
-			if($bodyParams) {
-				foreach($bodyParams as $paramName => $paramValue) {
-					$parameters[$paramName] = $paramValue;
-				}
+			foreach((array) $bodyParams as $paramName => $paramValue) {
+				$parameters[$paramName] = $paramValue;
 			}
 			$this->format = "json";
 		} else if(strpos($contentType, "application/x-www-form-urlencoded") !== false) {
