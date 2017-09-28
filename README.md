@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/MiguelSMendoza/CyberREST.svg?branch=master)](https://travis-ci.org/MiguelSMendoza/CyberREST) [![Test Coverage](https://travis-ci.org/MiguelSMendoza/CyberREST.svg/badges/coverage.svg)](https://travis-ci.org/MiguelSMendoza/CyberREST/coverage)
+[![Build Status](https://travis-ci.org/MiguelSMendoza/CyberREST.svg?branch=master)](https://travis-ci.org/MiguelSMendoza/CyberREST) [![Test Coverage](https://codeclimate.com/github/MiguelSMendoza/CyberREST.svg/badges/coverage.svg)](https://codeclimate.com/github/MiguelSMendoza/CyberREST/coverage)
 # CyberREST
 Helper Class to create a REST API simmilar to Silex
 ## Usage
