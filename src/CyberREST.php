@@ -22,10 +22,8 @@ class CyberConfig {
  
 class CyberREST {
 
-	public $_allow = array();
-	public $_content_type = "application/json";
-	public $_request = array();
-	public $_format = "json";
+	public $ContentType = "application/json";
+	public $Request = array();
 	
 	private $JWTKey = "";
 	private $ServerName = "";
@@ -34,19 +32,15 @@ class CyberREST {
 	private $parameters = array();
 	private $patternParts = array();
 
-	private $_method = "";
 	private $_code = 200;
-	
-	private $server;
 
 	public function __construct($config= "API") {
+		$this->apiStart = $config;
 		if(is_a($config, 'CyberConfig')) {
 			$this->apiStart = $config->API;
 			$this->JWTKey = $config->Secret;
 			$this->ServerName = $config->ServerName;
-		} else {
-			$this->apiStart = $config;
-		}
+		} 
 		$this->inputs();
 		$this->requestParts = $this->getRequestPartsFrom($this->apiStart);
 		$this->parameters = $this->parseIncomingParams();
@@ -54,12 +48,11 @@ class CyberREST {
 		
 	public function getAuthHeader() {
 		$headers = apache_request_headers();
+		$authHeader = false;
 		if(isset($headers['Authorization'])) {
 			$authHeader = $headers['Authorization'];
 		} else if (isset($headers['authorization'])) {
 			$authHeader = $headers['authorization'];
-		} else {
-			return false;
 		}
 		return $authHeader;
 	}
@@ -67,15 +60,15 @@ class CyberREST {
 	/* throws ExpiredException */	
 	public function authorizeRequest() {
 		$authHeader=$this->getAuthHeader();
-		if($authHeader)	{	
-			list($jwt) = sscanf($authHeader, 'Bearer %s');
-			$secretKey = base64_decode($this->JWTKey);
-			$token = Firebase\JWT\JWT::decode($jwt, $secretKey, array('HS512'));
-			$newToken = $this->createToken($token->data);
-			return ["token"=>$newToken, "data"=>$token->data];
-		} else {
+		if(!$authHeader) {
 			throw new Exception('Not Authorized');
+			return false;
 		}
+		list($jwt) = sscanf($authHeader, 'Bearer %s');
+		$secretKey = base64_decode($this->JWTKey);
+		$token = Firebase\JWT\JWT::decode($jwt, $secretKey, array('HS512'));
+		$newToken = $this->createToken($token->data);
+		return ["token"=>$newToken, "data"=>$token->data];
 	}
 	
 	function createToken($data) {
@@ -106,10 +99,10 @@ class CyberREST {
 	
 	public function checkRefererWhiteList($whitelist=array()) {
 		$refererHost = parse_url($this->getReferer(), PHP_URL_HOST);
-		$in = in_array($refererHost, $whitelist);
+		$inArray = in_array($refererHost, $whitelist);
 		$wowww = str_replace("www.", "", $refererHost);
 		$inwowww = in_array($wowww, $whitelist);
-		return ($in || $inwowww);
+		return ($inArray || $inwowww);
 	}
 	
 	public function getApiStart() {
@@ -186,7 +179,7 @@ class CyberREST {
 		return $params;
 	}
 	
-	public function parsePattern($pattern) {
+	private function parsePattern($pattern) {
 		$parts = explode('/', $pattern);
 		if(!isset($parts[0])) return array();
 		if($parts[0]==="") { 
@@ -214,15 +207,15 @@ class CyberREST {
 	}
 	
 	public function getClientIP() {
-		$ip="";
+		$clientIP="";
 		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-		    $ip = $_SERVER['HTTP_CLIENT_IP'];
+		    $clientIP = $_SERVER['HTTP_CLIENT_IP'];
 		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-		    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		    $clientIP = $_SERVER['HTTP_X_FORWARDED_FOR'];
 		} elseif (!empty($_SERVER['REMOTE_ADDR'])) {
-		    $ip = $_SERVER['REMOTE_ADDR'];
+		    $clientIP = $_SERVER['REMOTE_ADDR'];
 		}
-		return $ip;
+		return $clientIP;
 	}
 
 	public function getReferer(){
@@ -236,7 +229,7 @@ class CyberREST {
 		$this->_code = ($status)?$status:200;
 		$this->setHeaders();
 		echo $this->parseResponse($data);
-		die();
+		die($this->_code);
 	}
 	
 	private function parseResponse($data) {
@@ -303,15 +296,15 @@ class CyberREST {
 	private function inputs(){
 		switch($this->getRequestMethod()){
 		case "POST":
-			$this->_request = $this->cleanInputs($_POST);
+			$this->Request = $this->cleanInputs($_POST);
 			break;
 		case "GET":
 		case "DELETE":
-			$this->_request = $this->cleanInputs($_GET);
+			$this->Request = $this->cleanInputs($_GET);
 			break;
 		case "PUT":
-			parse_str(file_get_contents("php://input"),$this->_request);
-			$this->_request = $this->cleanInputs($this->_request);
+			parse_str(file_get_contents("php://input"),$this->Request);
+			$this->Request = $this->cleanInputs($this->Request);
 			break;
 		default:
 			//$this->response('Bad Request',200);
@@ -325,13 +318,13 @@ class CyberREST {
 			foreach($data as $k => $v){
 				$clean_input[$k] = $this->cleanInputs($v);
 			}
-		} else{
-			if(get_magic_quotes_gpc()){
-				$data = trim(stripslashes($data));
-			}
-			$data = strip_tags($data);
-			$clean_input = trim($data);
+			return $clean_input;
 		}
+		if(get_magic_quotes_gpc()){
+			$data = trim(stripslashes($data));
+		}
+		$data = strip_tags($data);
+		$clean_input = trim($data);
 		return $clean_input;
 	}
 
@@ -339,7 +332,7 @@ class CyberREST {
 	private function setHeaders(){
 		if(!headers_sent()){
 			header("HTTP/1.1 ".$this->_code." ".$this->getStatusMessage());
-			header("Content-Type:".$this->_content_type."; charset=utf-8");
+			header("Content-Type:".$this->ContentType."; charset=utf-8");
 		}
 	}
 
@@ -382,7 +375,8 @@ class CyberREST {
 				$parameters[$field] = $value;
 			}
 			$this->format = "html";
-		} else {
+		} 
+		if(empty($parameters)) {
 			parse_str($body, $postvars);
 			foreach($postvars as $field => $value) {			
 				$parameters[$field] = $value;
@@ -423,32 +417,28 @@ class CyberREST {
 		return json_encode($array);
 	}
 	
-	function getHeaders() 
-    { 
-           $headers = ''; 
-       foreach ($_SERVER as $name => $value) 
-       { 
-           if (substr($name, 0, 5) == 'HTTP_') 
-           { 
-               $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value; 
-           } 
-       } 
-       return $headers; 
-    } 
+	function getHeaders()  { 
+		$headers = ''; 
+		foreach ($_SERVER as $name => $value)  { 
+			if (substr($name, 0, 5) == 'HTTP_') { 
+				$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value; 
+			} 
+		} 
+		return $headers; 
+	} 
 }
 
 if (!function_exists('apache_request_headers')) { 
-        function apache_request_headers() { 
-            foreach($_SERVER as $key=>$value) { 
-                if (substr($key,0,5)=="HTTP_") { 
-                    $key=str_replace(" ","-",ucwords(strtolower(str_replace("_"," ",substr($key,5))))); 
-                    $out[$key]=$value; 
-                }else{
-                    $out[$key]=$value; 
-		}
-            } 
-            return $out; 
-        } 
+	function apache_request_headers() { 
+		foreach($_SERVER as $key=>$value) { 
+			$out[$key]=$value; 
+			if (substr($key,0,5)=="HTTP_") { 
+				$key=str_replace(" ","-",ucwords(strtolower(str_replace("_"," ",substr($key,5))))); 
+				$out[$key]=$value; 
+			}
+		} 
+		return $out; 
+	} 
 }
 
 ?>
