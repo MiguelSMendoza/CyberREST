@@ -10,6 +10,9 @@
          stopOnFailure="false"
          syntaxCheck="false"
          bootstrap="test/bootstrap.php">
+  <logging>
+      <log type="coverage-clover" target="build/logs/clover.xml"/>
+  </logging>
   <testsuites>
     <testsuite name="CyberREST Test Suite">
       <directory>./test/CyberREST/</directory>
