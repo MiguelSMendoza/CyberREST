@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/MiguelSMendoza/CyberREST.svg?branch=master)](https://travis-ci.org/MiguelSMendoza/CyberREST)
 # CyberREST
 Helper Class to create a REST API simmilar to Silex
 ## Usage
