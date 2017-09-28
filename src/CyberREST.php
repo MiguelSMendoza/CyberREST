@@ -32,7 +32,7 @@ class CyberREST {
 	private $parameters = array();
 	private $patternParts = array();
 
-	private $_code = 200;
+	private $code = 200;
 
 	public function __construct($config= "API") {
 		$this->apiStart = $config;
@@ -226,10 +226,10 @@ class CyberREST {
 	}
 
 	public function response($data,$status){
-		$this->_code = ($status)?$status:200;
+		$this->code = ($status)?$status:200;
 		$this->setHeaders();
 		echo $this->parseResponse($data);
-		die($this->_code);
+		die($this->code);
 	}
 	
 	private function parseResponse($data) {
@@ -283,7 +283,7 @@ class CyberREST {
 			503 => 'Service Unavailable',
 			504 => 'Gateway Timeout',
 			505 => 'HTTP Version Not Supported');
-		return ($status[$this->_code])?$status[$this->_code]:$status[500];
+		return ($status[$this->code])?$status[$this->code]:$status[500];
 	}
 
 	public function getRequestMethod(){
@@ -313,25 +313,25 @@ class CyberREST {
 	}
 
 	private function cleanInputs($data){
-		$clean_input = array();
+		$cleanInput = array();
 		if(is_array($data)){
 			foreach($data as $k => $v){
-				$clean_input[$k] = $this->cleanInputs($v);
+				$cleanInput[$k] = $this->cleanInputs($v);
 			}
-			return $clean_input;
+			return $cleanInput;
 		}
 		if(get_magic_quotes_gpc()){
 			$data = trim(stripslashes($data));
 		}
 		$data = strip_tags($data);
-		$clean_input = trim($data);
-		return $clean_input;
+		$cleanInput = trim($data);
+		return $cleanInput;
 	}
 
 
 	private function setHeaders(){
 		if(!headers_sent()){
-			header("HTTP/1.1 ".$this->_code." ".$this->getStatusMessage());
+			header("HTTP/1.1 ".$this->code." ".$this->getStatusMessage());
 			header("Content-Type:".$this->ContentType."; charset=utf-8");
 		}
 	}
@@ -357,19 +357,19 @@ class CyberREST {
 		if(!$body) {
 			return $parameters;
 		}
-		$content_type = false;
+		$contentType = false;
 		if(isset($_SERVER['CONTENT_TYPE'])) {
-			$content_type = $_SERVER['CONTENT_TYPE'];
+			$contentType = $_SERVER['CONTENT_TYPE'];
 		}
-		if(strpos($content_type, "application/json") !== false) {
-			$body_params = json_decode($body);
-			if($body_params) {
-				foreach($body_params as $param_name => $param_value) {
-					$parameters[$param_name] = $param_value;
+		if(strpos($contentType, "application/json") !== false) {
+			$bodyParams = json_decode($body);
+			if($bodyParams) {
+				foreach($bodyParams as $paramName => $paramValue) {
+					$parameters[$paramName] = $paramValue;
 				}
 			}
 			$this->format = "json";
-		} else if(strpos($content_type, "application/x-www-form-urlencoded") !== false) {
+		} else if(strpos($contentType, "application/x-www-form-urlencoded") !== false) {
 			parse_str($body, $postvars);
 			foreach($postvars as $field => $value) {			
 				$parameters[$field] = $value;
