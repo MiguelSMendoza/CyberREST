@@ -10,7 +10,7 @@ class CyberRESTTest extends TestCase
 		});
 		$this->assertFalse($cyber->checkRefererWhiteList());
 		$this->assertNotNUll($cyber->createToken(["nombre"=>"Miguel"]));
-        $this->assertNotNUll($cyber->getReferer());
+        $this->assertNotNUll($cyber->getRequestMethod());
         $this->assertNotNUll($cyber->getClientIP());
         $this->assertEquals("TEST", $cyber->getApiStart());
         $this->assertNotNUll($cyber->getRequestParts());

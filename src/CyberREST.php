@@ -34,10 +34,7 @@ class CyberREST {
 	private $parameters = array();
 	private $patternParts = array();
 
-	private $_method = "";
 	private $_code = 200;
-	
-	private $server;
 
 	public function __construct($config= "API") {
 		if(is_a($config, 'CyberConfig')) {
@@ -186,7 +183,7 @@ class CyberREST {
 		return $params;
 	}
 	
-	public function parsePattern($pattern) {
+	private function parsePattern($pattern) {
 		$parts = explode('/', $pattern);
 		if(!isset($parts[0])) return array();
 		if($parts[0]==="") { 
@@ -240,7 +237,7 @@ class CyberREST {
 		$this->_code = ($status)?$status:200;
 		$this->setHeaders();
 		echo $this->parseResponse($data);
-		die();
+		die($this->_code);
 	}
 	
 	private function parseResponse($data) {
@@ -297,11 +294,12 @@ class CyberREST {
 		return ($status[$this->_code])?$status[$this->_code]:$status[500];
 	}
 
-	public function getRequestMethod(){
-		if(isset($_SERVER['REQUEST_METHOD']))
-			return $_SERVER['REQUEST_METHOD'];
+	public function getRequestMethod() {
+		$method = filter_input(INPUT_SERVER, 'REQUEST_METHOD', FILTER_SANITIZE_STRING);
+		if(isset($method))
+			return $method;
 		else
-			return '';
+			return NULL;
 	}
 
 	private function inputs(){
