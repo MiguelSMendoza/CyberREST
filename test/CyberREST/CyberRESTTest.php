@@ -1,6 +1,6 @@
 <?php
-	
-class CyberRESTTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+class CyberRESTTest extends TestCase
 {
 	public function testGetMapping() {
 		$config = new CyberConfig("TEST", "blablabla", "CyberPruebas");
@@ -8,7 +8,6 @@ class CyberRESTTest extends \PHPUnit_Framework_TestCase
 		$cyber->get("/test/{foo}/{bar}", function($app, $id, $nombre) {
 			//NOTHING;
 		});
-		$this->assertNull($cyber->authorizeRequest());
 		$this->assertFalse($cyber->checkRefererWhiteList());
 		$this->assertNotNUll($cyber->createToken(["nombre"=>"Miguel"]));
         $this->assertNotNUll($cyber->getReferer());
@@ -17,5 +16,15 @@ class CyberRESTTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNUll($cyber->getRequestParts());
         $this->assertNotNUll($cyber->getParameters());
         $this->assertEquals(["test","{foo}","{bar}"],$cyber->parsePattern("/test/{foo}/{bar}"));
+	}
+
+	public function testCanAuthorizeRequest() {
+		$config = new CyberConfig("TEST", "blablabla", "CyberPruebas");
+		$cyber = new CyberREST($config);
+		$cyber->get("/test/{foo}/{bar}", function($app, $id, $nombre) {
+			//NOTHING;
+		});
+		$this->expectException(Exception::class);
+		$cyber->authorizeRequest();
 	}
 }
