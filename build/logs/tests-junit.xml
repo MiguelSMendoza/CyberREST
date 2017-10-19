@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="CyberREST Test Suite" tests="4" assertions="13" errors="0" failures="0" skipped="0" time="0.008533">
-    <testsuite name="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" tests="4" assertions="13" errors="0" failures="0" skipped="0" time="0.008533">
-      <testcase name="testGetMapping" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="9" assertions="7" time="0.002534"/>
-      <testcase name="testClientIp" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="25" assertions="3" time="0.001275"/>
-      <testcase name="testCanEncodeJSONforHTML" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="38" assertions="1" time="0.001072"/>
-      <testcase name="testCanAuthorizeRequest" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="44" assertions="2" time="0.003652"/>
+  <testsuite name="CyberREST Test Suite" tests="4" assertions="13" errors="0" failures="0" skipped="0" time="0.009067">
+    <testsuite name="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" tests="4" assertions="13" errors="0" failures="0" skipped="0" time="0.009067">
+      <testcase name="testGetMapping" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="9" assertions="7" time="0.004144"/>
+      <testcase name="testClientIp" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="25" assertions="3" time="0.001272"/>
+      <testcase name="testCanEncodeJSONforHTML" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="38" assertions="1" time="0.001040"/>
+      <testcase name="testCanAuthorizeRequest" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="44" assertions="2" time="0.002611"/>
     </testsuite>
   </testsuite>
 </testsuites>

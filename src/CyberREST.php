@@ -263,10 +263,10 @@ class CyberREST {
 	}
 	
 	private function parseResponse($data) {
-		if(!is_array($data) && !is_object($data)) {
-			$data = ["response" => $data];
+		$response = $data;
+		if(is_array($data) || is_object($data)) {
+			$response = json_encode($data);
 		}
-		$response = json_encode($data);
 		return $response;
 	}
 

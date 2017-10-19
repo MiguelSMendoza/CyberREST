@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1506617740">
-  <project timestamp="1506617740">
+<coverage generated="1508399638">
+  <project timestamp="1508399638">
     <file name="/Users/miguel/Workspace/CyberREST/src/CyberREST.php">
       <class name="CyberConfig" namespace="global">
         <metrics complexity="1" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="4" coveredstatements="4" elements="5" coveredelements="5"/>
