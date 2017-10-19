@@ -49,7 +49,8 @@ class CyberConfig {
 	}
 
 	public function getAuthHeader() {
-		$headers = apache_request_headers();
+		$headers = Environment::getServer();
+		// $headers = apache_request_headers();
 		$authHeader = false;
 		if(isset($headers['Authorization'])) {
 			$authHeader = $headers['Authorization'];

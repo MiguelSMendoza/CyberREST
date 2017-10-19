@@ -41,14 +41,28 @@ class CyberRESTTest extends TestCase
 		$this->assertEquals('{"html":"&lt;h1&gt;H&oacute;l&auml;&lt;\/h1&gt;"}', $cyber->encodeJSONforHTML($array));
 	}
 
-	public function testCanAuthorizeRequest() {
+	public function testCanAuthorizeRequest1() {
+		unset($_SERVER["authorization"]);
+		$cyber = $this->getInstance();
+		$this->assertNotNUll($cyber->OAuth->createToken(["nombre"=>"Miguel"]));
+		$_SERVER["Authorization"] = $cyber->OAuth->createToken(["nombre"=>"Miguel"]);
+		$this->expectException(Exception::class);
+		$cyber->OAuth->authorizeRequest();
+	}
+
+	public function testCanAuthorizeRequest2() {
+		unset($_SERVER["Authorization"]);
 		$cyber = $this->getInstance();
 		$this->assertNotNUll($cyber->OAuth->createToken(["nombre"=>"Miguel"]));
 		$_SERVER["authorization"] = $cyber->OAuth->createToken(["nombre"=>"Miguel"]);
 		$this->expectException(Exception::class);
 		$cyber->OAuth->authorizeRequest();
+	}
+
+	public function testCanUnAuthorizeRequest() {
+		$cyber = $this->getInstance();
+		unset($_SERVER["Authorization"]);
 		unset($_SERVER["authorization"]);
-		$_SERVER["Authorization"] = $cyber->OAuth->createToken(["nombre"=>"Miguel"]);
 		$this->expectException(Exception::class);
 		$cyber->OAuth->authorizeRequest();
 	}
