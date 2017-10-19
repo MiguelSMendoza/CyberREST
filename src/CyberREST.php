@@ -32,6 +32,10 @@ class CyberConfig {
 	 }
  }
 
+ class NotAuthorizedException extends Exception {
+
+}
+
  class OAuth {
 	private $Firebase;
 	private $jwtKey = "";
@@ -42,7 +46,7 @@ class CyberConfig {
 		$this->ServerName = $name;
 	}
 
-	public function __construct($serverName="CyberREST", $jwtKey="") {
+	public function __construct($serverName="CyberREST", $jwtKey="CyberREST") {
 		$this->Firebase = new Firebase\JWT\JWT();
 		$this->ServerName = $serverName;
 		$this->jwtKey = $jwtKey;
@@ -64,7 +68,7 @@ class CyberConfig {
 	public function authorizeRequest() {
 		$authHeader=$this->getAuthHeader();
 		if(!$authHeader) {
-			throw new Exception('Not Authorized');
+			throw new NotAuthorizedException('Not Authorized');
 			return false;
 		}
 		list($jwt) = sscanf($authHeader, 'Bearer %s');
