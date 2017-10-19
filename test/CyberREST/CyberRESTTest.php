@@ -47,5 +47,9 @@ class CyberRESTTest extends TestCase
 		$_SERVER["Authorization"] = $cyber->OAuth->createToken(["nombre"=>"Miguel"]);
 		$this->expectException(Exception::class);
 		$cyber->OAuth->authorizeRequest();
+		unset($_SERVER["Authorization"]);
+		$_SERVER["authorization"] = $cyber->OAuth->createToken(["nombre"=>"Miguel"]);
+		$this->expectException(Exception::class);
+		$cyber->OAuth->authorizeRequest();
 	}
 }
