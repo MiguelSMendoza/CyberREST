@@ -1,6 +1,6 @@
-projectKey=thisisakey:master
+projectKey=CyberREST
 serverUrl=http://localhost:9000
 serverVersion=6.5.0.27846
-dashboardUrl=http://localhost:9000/dashboard/index/thisisakey:master
-ceTaskId=AV7JamnaZ2QSAolMzOL4
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AV7JamnaZ2QSAolMzOL4
+dashboardUrl=http://localhost:9000/dashboard/index/CyberREST
+ceTaskId=AV85FOUcJLT_T-L1j5Gg
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AV85FOUcJLT_T-L1j5Gg

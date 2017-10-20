@@ -15,11 +15,50 @@ class CyberRESTTest extends TestCase
 			$this->assertEquals("foo", $id);
 			$this->assertEquals("bar", $nombre);
 		});
+		$_SERVER["REQUEST_METHOD"] = "POST";
+		$cyber->post("/test/{foo}/{bar}", function($app, $id, $nombre) {
+			$this->assertEquals("foo", $id);
+			$this->assertEquals("bar", $nombre);
+		});
+		$_SERVER["REQUEST_METHOD"] = "PUT";
+		$cyber->put("/test/{foo}/{bar}", function($app, $id, $nombre) {
+			$this->assertEquals("foo", $id);
+			$this->assertEquals("bar", $nombre);
+		});
+		$_SERVER["REQUEST_METHOD"] = "DELETE";
+		$cyber->delete("/test/{foo}/{bar}", function($app, $id, $nombre) {
+			$this->assertEquals("foo", $id);
+			$this->assertEquals("bar", $nombre);
+		});
+		$this->assertEquals(["test","{foo}","{bar}"],$cyber->getPatternParts());
+	}
+
+	public function testVariables() {
+		$_SERVER["REQUEST_URI"] = "http://www.foo.bar/API/test/foo/bar";
+		$cyber = $this->getInstance();
 		$this->assertFalse($cyber->checkRefererWhiteList());
 		$this->assertEquals("API", $cyber->getApiStart());
-        $this->assertEquals(["test","foo","bar"],$cyber->getRequestParts());
-        $this->assertNotNUll($cyber->getParameters());
-        //$this->assertEquals(["test","{foo}","{bar}"],$cyber->parsePattern("/test/{foo}/{bar}"));
+		$this->assertEquals(["test","foo","bar"],$cyber->getRequestParts());
+	}
+
+	public function testGETParameters() {
+		$cyber = $this->getInstance();
+		$client = new GuzzleHttp\Client(['base_uri' => 'http://localhost:1349']);
+		$response = $client->get('http://localhost:1349/API/test?foo=bar&faa=bar');
+		$this->assertEquals(["foo"=>"bar", "faa"=>"bar"], json_decode($response->getBody(true), true));
+	}
+
+	public function testPOSTParameters() {
+		$cyber = $this->getInstance();
+		$client = new GuzzleHttp\Client(['base_uri' => 'http://localhost:1349']);
+		$data = array(
+			'form_params' => array(
+				'foo' => 'bar',
+				'num' => 5
+			)
+		);
+		$response = $client->post('http://localhost:1349/API/test', $data);
+		$this->assertEquals(["foo"=>"bar", "num"=>5], json_decode($response->getBody(true), true));
 	}
 
 	public function testClientIp() {
@@ -70,5 +109,17 @@ class CyberRESTTest extends TestCase
 		$_SERVER["authorization"] = 'Bearer A.B.C';
 		$this->expectException(Exception::class);
 		$cyber->OAuth->authorizeRequest();
+	}
+
+	public function testResponse() {
+		$cyber = $this->getInstance();
+		ob_start();
+		$cyber->response(["Foo"=>"bar"], 200);
+		$response = ob_get_clean();
+		$this->assertEquals('{"Foo":"bar"}', $response);
+		ob_start();
+		$cyber->response(437, 200);
+		$response = ob_get_clean();
+		$this->assertEquals(437, $response);
 	}
 }

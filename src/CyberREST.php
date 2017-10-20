@@ -54,7 +54,6 @@ class CyberConfig {
 
 	public function getAuthHeader() {
 		$headers = Environment::getServer();
-		// $headers = apache_request_headers();
 		$authHeader = false;
 		if(isset($headers['Authorization'])) {
 			$authHeader = $headers['Authorization'];
@@ -69,7 +68,6 @@ class CyberConfig {
 		$authHeader=$this->getAuthHeader();
 		if(!$authHeader) {
 			throw new NotAuthorizedException('Not Authorized');
-			return false;
 		}
 		list($jwt) = sscanf($authHeader, 'Bearer %s');
 		$secretKey = base64_decode($this->jwtKey);
@@ -123,6 +121,10 @@ class CyberREST {
 		$this->apiStart = $config;
 		$this->Environment = new Environment();
 		$this->OAuth = new OAuth();
+		$this->init($config);
+	}
+
+	public function init($config) {
 		if(is_a($config, 'CyberConfig')) {
 			$this->apiStart = $config->API;
 			$this->OAuth->setServerData($config->ServerName, $config->Secret);
@@ -187,9 +189,7 @@ class CyberREST {
 	}
 	
 	private function isParameter($string) {
-		if(preg_match('/{\w+}/', $string)>0) 
-			return true;
-		return false;
+		return preg_match('/{\w+}/', $string) > 0;
 	}
 	
 	private function cleanParameter($param) {
@@ -216,7 +216,9 @@ class CyberREST {
 	
 	private function parsePattern($pattern) {
 		$parts = explode('/', $pattern);
-		if(!isset($parts[0])) return array();
+		if(!isset($parts[0])) {
+			return array();
+		}
 		if($parts[0]==="") { 
 			unset($parts[0]);
 			$parts = array_values($parts);
@@ -264,7 +266,6 @@ class CyberREST {
 		$this->code = ($status)?$status:200;
 		$this->setHeaders();
 		echo $this->parseResponse($data);
-		// die($this->code);
 	}
 	
 	private function parseResponse($data) {
@@ -339,7 +340,7 @@ class CyberREST {
 			$this->Request = $this->cleanInputs($this->Request);
 			break;
 		default:
-			//$this->response('Bad Request',200);
+			$this->response('Bad Request',404);
 			break;
 		}
 	}
@@ -356,8 +357,7 @@ class CyberREST {
 			$data = trim(stripslashes($data));
 		}
 		$data = strip_tags($data);
-		$cleanInput = trim($data);
-		return $cleanInput;
+		return trim($data);
 	}
 
 
@@ -413,14 +413,12 @@ class CyberREST {
 	}
 
 	public function getRequestPartsFrom($apiStart = 'API') {
-		$uri = "";
-		$requestUri = $this->Environment->getServerVar('REQUEST_URI');
-		if(empty($requestUri))
+		$uri = $this->Environment->getServerVar('REQUEST_URI');
+		if(empty($uri)) {
 			$uri ="/";
-		else if (strpos($requestUri, '?') !== false) 
-		    $uri = substr($requestUri, 0, strpos($requestUri, '?'));
-		else 
-			$uri = $requestUri;
+		} else if (strpos($uri, '?') !== false) {
+			$uri = substr($uri, 0, strpos($uri, '?'));
+		} 
 		$parts = explode('/', $uri);
 		$index = 0;
 		while(isset($parts[$index]) && $parts[$index]!=$apiStart) {
@@ -428,19 +426,21 @@ class CyberREST {
 			$index++;
 		}
 		unset($parts[$index]);
-		if(isset($parts[$index+1]) && ((strpos($parts[$index+1],".php")!==false))) unset($parts[$index+1]);
+		if(isset($parts[$index+1]) && ((strpos($parts[$index+1],".php")!==false))) {
+			unset($parts[$index+1]);
+		}
 		return array_values($parts);
 	}
 
 	public function encodeJSONforHTML($array) {
-		if(is_array($array))
-		array_walk_recursive($array, function(&$item, $key) {
-				if(is_string($item)) {
-					$item = htmlentities($item);
-				}
-			});
-		else
+		if (!is_array($array)) {
 			$array = array();
+		}
+		array_walk_recursive($array, function(&$item, $key) {
+			if(is_string($item)) {
+				$item = htmlentities($item);
+			}
+		});
 		return json_encode($array);
 	}
 	

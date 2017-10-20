@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="CyberREST Test Suite" tests="6" assertions="17" errors="0" failures="0" skipped="0" time="0.011316">
-    <testsuite name="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" tests="6" assertions="17" errors="0" failures="0" skipped="0" time="0.011316">
-      <testcase name="testGetMapping" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="9" assertions="7" time="0.002549"/>
-      <testcase name="testClientIp" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="25" assertions="3" time="0.001344"/>
-      <testcase name="testCanEncodeJSONforHTML" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="38" assertions="1" time="0.001045"/>
-      <testcase name="testCanAuthorizeRequest" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="44" assertions="4" time="0.003846"/>
-      <testcase name="testCanUnAuthorizeRequest" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="58" assertions="1" time="0.001221"/>
-      <testcase name="testCanUnAuthorizeWrongToken" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="66" assertions="1" time="0.001311"/>
+  <testsuite name="CyberREST Test Suite" tests="10" assertions="27" errors="0" failures="0" skipped="0" time="0.052532">
+    <testsuite name="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" tests="10" assertions="27" errors="0" failures="0" skipped="0" time="0.052532">
+      <testcase name="testGetMapping" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="9" assertions="10" time="0.003470"/>
+      <testcase name="testVariables" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="36" assertions="3" time="0.001289"/>
+      <testcase name="testGETParameters" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="44" assertions="1" time="0.024122"/>
+      <testcase name="testPOSTParameters" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="51" assertions="1" time="0.013288"/>
+      <testcase name="testClientIp" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="64" assertions="3" time="0.001460"/>
+      <testcase name="testCanEncodeJSONforHTML" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="77" assertions="1" time="0.001143"/>
+      <testcase name="testCanAuthorizeRequest" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="83" assertions="4" time="0.003439"/>
+      <testcase name="testCanUnAuthorizeRequest" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="97" assertions="1" time="0.001168"/>
+      <testcase name="testCanUnAuthorizeWrongToken" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="105" assertions="1" time="0.001255"/>
+      <testcase name="testResponse" class="CyberRESTTest" classname="CyberRESTTest" file="/Users/miguel/Workspace/CyberREST/test/CyberREST/CyberRESTTest.php" line="114" assertions="2" time="0.001898"/>
     </testsuite>
   </testsuite>
 </testsuites>
